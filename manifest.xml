@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE extension SYSTEM "ext-1.0.dtd">
+<extension engine="1.0">
+    <id>reply_by_email</id>
+    <title>Reply By Email</title>
+    <version>0.2.0b</version>
+    <description>Allows users to reply by email to topics and posts</description>
+    <author>Paul Thomas</author>
+    
+    <minversion>1.4.2</minversion>
+    <maxtestedon>1.4.2</maxtestedon>
+    
+    <note type="install">Requires a replypush.com account http://replypush.com</note>
+    <hooks>
+        <hook id="es_essentials"><![CDATA[
+            require_once($ext_info['path'].'/class.replybyemail.php');
+        ]]></hook>
+        <hook id="po_pre_add_post, po_pre_add_topic"><![CDATA[
+            $new_pid = 0;
+        ]]></hook>
+        <hook id="fn_send_subscriptions_qr_get_users_to_notify"><![CDATA[
+            reply_by_email::handler()->on_get_subscribers('post', $post_info, $new_pid, $query);
+        ]]></hook>
+        <hook id="fn_send_forum_subscriptions_qr_get_users_to_notify"><![CDATA[
+            reply_by_email::handler()->on_get_subscribers('topic', $topic_info, $new_tid, $query);
+        ]]></hook>
+        <hook id="em_fn_forum_mail_pre_send"><![CDATA[
+            reply_by_email::handler()->on_before_send($headers);
+        ]]></hook>
+        <hook id="fn_send_subscriptions_end, fn_send_forum_subscriptions_end"><![CDATA[
+            reply_by_email::handler()->on_subscriptions_send($subscribers);
+        ]]></hook>
+        <hook id="re_rewrite_rules"><![CDATA[
+            reply_by_email::handler()->rewrite();
+        ]]></hook>
+        <hook id="co_modify_url_scheme"><![CDATA[
+            reply_by_email::handler()->url_scheme();
+        ]]></hook>
+        <hook id="ca_fn_generate_admin_menu_new_sublink"><![CDATA[
+            reply_by_email::handler()->settings()->menu_link($forum_page);
+        ]]></hook>
+        <hook id="aop_new_section, aop_new_section_validation"><![CDATA[
+            reply_by_email::handler()->settings()->controller();
+        ]]></hook>
+        <hook id="hd_main_elements"><![CDATA[
+            reply_by_email::handler()->settings()->set_up_msg();
+        ]]></hook>
+    </hooks>
+    <install><![CDATA[
+        require_once($ext_info['path'].'/class.replybyemail.php');
+        reply_by_email::setup();
+    ]]></install>
+</extension>
